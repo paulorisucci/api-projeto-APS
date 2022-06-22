@@ -1,15 +1,15 @@
 package livraria.imperial.controllers;
 
-import livraria.imperial.domain.model.dtos.UserLoginRequest;
-import livraria.imperial.domain.model.entities.User;
-import livraria.imperial.domain.model.responses.UserProjection;
+import livraria.imperial.domain.model.dtos.LoginRequest;
+import livraria.imperial.domain.model.entities.UserEntity;
+import livraria.imperial.domain.model.mappers.UserMapper;
+import livraria.imperial.domain.model.responses.UserResponse;
 import livraria.imperial.domain.model.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.websocket.server.PathParam;
 import java.util.List;
 
 
@@ -17,54 +17,68 @@ import java.util.List;
 @RequestMapping( value = "/users", produces = {MediaType.APPLICATION_JSON_VALUE})
 public class UserController {
 
-    private UserService service;
+    private final UserService service;
 
-    public UserController(UserService service) {
+    private final UserMapper mapper;
+
+    public UserController(UserService service, UserMapper mapper) {
         this.service = service;
-    }
-
-    @GetMapping
-    public ResponseEntity<List<UserProjection>> listUsers() {
-
-
-        return  ResponseEntity.ok(service.listUsers());
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<UserProjection> login(@RequestBody UserLoginRequest loginRequest) {
-        User loggedUser = service.login(loginRequest);
-
-        return ResponseEntity.ok(userResponse.mapFromUserToResponse(loggedUser));
+        this.mapper = mapper;
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public User createUser(@RequestBody User user) {
-        return service.saveUser(user);
+    public UserResponse createUser(@RequestBody UserEntity user) {
+
+        var response = mapper.mapEntityToResponse(service.save(user));
+        return response;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<UserResponse>> listUsers() {
+
+        final var usersList = service.list();
+
+        final var response = mapper.mapListToResponse(usersList);
+
+        return  ResponseEntity.ok(response);
     }
 
     @GetMapping("/{idUser}")
-    public ResponseEntity<UserProjection> getUser(@PathParam("idUser") Integer idUser) {
-        User foundUser = service.getUser(idUser);
+    public ResponseEntity<UserResponse> getUser(@PathVariable("idUser") Integer idUser) {
+        final var foundUser = service.find(idUser);
 
-        return ResponseEntity.ok(userResponse.mapFromUserToResponse(foundUser));
+        final var response = mapper.mapEntityToResponse(foundUser);
+
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{idUser}")
-    public ResponseEntity<UserProjection> update(@PathParam("idUser") Integer idUser, @RequestBody User user) {
+    public ResponseEntity<UserResponse> update(@PathVariable("idUser") Integer idUser, @RequestBody UserEntity user) {
 
         user.setId(idUser);
 
-        User savedUser = service.saveUser(user);
+        final var savedUser = service.save(user);
 
-        return ResponseEntity.ok();
+        final var response = mapper.mapEntityToResponse(savedUser);
+
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{idUser}")
-    public ResponseEntity delete(@PathParam("idUser") Integer idUser) {
+    public ResponseEntity<Void> delete(@PathVariable("idUser") Integer idUser) {
 
-        service.deleteUser(idUser);
+        service.delete(idUser);
 
-        return (ResponseEntity) ResponseEntity.noContent();
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<UserResponse> login(@RequestBody LoginRequest loginRequest) {
+        final var loggedUser = service.login(loginRequest);
+
+        final var response = mapper.mapEntityToResponse(loggedUser);
+
+        return ResponseEntity.ok(response);
     }
 }

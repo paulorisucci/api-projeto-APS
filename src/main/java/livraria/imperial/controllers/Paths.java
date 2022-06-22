@@ -4,13 +4,17 @@ public class Paths {
 
     public enum UserPaths {
 
-        USER("/user"),
+        USERS("/users"),
         ID("/{idUser}");
 
         private String path;
 
         UserPaths(String path) {
             this.path = path;
+        }
+
+        public String getPath() {
+            return this.path;
         }
     }
 }

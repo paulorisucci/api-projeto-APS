@@ -1,47 +1,52 @@
 package livraria.imperial.domain.model.services;
 
-import com.google.common.hash.Hashing;
-import livraria.imperial.domain.model.dtos.UserLoginRequest;
-import livraria.imperial.domain.model.entities.User;
+import livraria.imperial.domain.model.dtos.LoginRequest;
+import livraria.imperial.domain.model.entities.UserEntity;
+import livraria.imperial.domain.model.repositories.AdminRepository;
 import livraria.imperial.domain.model.repositories.UserRepository;
-import livraria.imperial.domain.model.responses.UserProjection;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class UserService {
 
-    private UserRepository repository;
+    private UserRepository userRepository;
 
-    public UserService(UserRepository repository) {
-        this.repository = repository;
+    private AdminRepository adminRepository;
+
+    public UserService(UserRepository userRepository, AdminRepository adminRepository) {
+        this.userRepository = userRepository;
+        this.adminRepository = adminRepository;
     }
 
-    public User saveUser(User user) {
-        user.setPassword(Hashing.sha256().hashString(user.getPassword(), StandardCharsets.UTF_8).toString());
-        return repository.save(user);
+    public UserEntity save(UserEntity user) {
+        return userRepository.save(user);
     }
 
-    public List<UserProjection> listUsers() {
-        return repository.findAllResponse();
+    public List<UserEntity> list() {
+        return userRepository.findAll();
     }
 
-    public User getUser(Integer id) {
-        return repository.findById(id).orElse(null);
+    public UserEntity find(Integer id) {
+        return userRepository.findById(id).orElse(null);
     }
 
-    public void deleteUser(Integer id) {
-        User deletedUser = repository.findById(id).orElse(null);
-        if(deletedUser != null) {
-            repository.delete(deletedUser);
-        }
+    public void delete(Integer id) {
+        final var deletedUser = userRepository.findById(id);
+        deletedUser.ifPresent( user -> userRepository.delete(user));
     }
 
-    public UserProjection login(UserLoginRequest loginRequest) {
-        loginRequest.setPassword(Hashing.sha256().hashString(loginRequest.getPassword(), StandardCharsets.UTF_8).toString());
+    public UserEntity login(LoginRequest loginRequest) {
+        return loginRequest.isAdmin() ? searchAdminForLogin(loginRequest) : searchUserForLogin(loginRequest);
+    }
 
-        return repository.findByLoginAndPassword(loginRequest.getLogin(), loginRequest.getPassword()).orElse(null);
+    public UserEntity searchUserForLogin(LoginRequest loginRequest) {
+        return userRepository.findByLoginAndPassword(loginRequest.getLogin(), loginRequest.getPassword()).orElse(null);
+    }
+
+    public UserEntity searchAdminForLogin(LoginRequest loginRequest) {
+        return adminRepository.findByLoginAndPassword(loginRequest.getLogin(), loginRequest.getPassword()).orElse(null);
     }
 }
