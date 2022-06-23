@@ -29,10 +29,10 @@ public class UserServiceTest {
         final int NUMBER_OF_CALLS = 1;
 
         //When
-        Mockito.when(userService.save(Mockito.any(UserEntity.class))).thenReturn(user);
+        Mockito.when(userService.create(Mockito.any(UserEntity.class))).thenReturn(user);
 
         //Then
-        userService.save(user);
+        userService.create(user);
 
         Mockito.verify(repository, Mockito.times(NUMBER_OF_CALLS)).save(Mockito.any(UserEntity.class));
     }

@@ -30,7 +30,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public UserResponse createUser(@RequestBody UserEntity user) {
 
-        var response = mapper.mapEntityToResponse(service.save(user));
+        var response = mapper.mapEntityToResponse(service.create(user));
         return response;
     }
 
@@ -58,7 +58,7 @@ public class UserController {
 
         user.setId(idUser);
 
-        final var savedUser = service.save(user);
+        final var savedUser = service.update(user);
 
         final var response = mapper.mapEntityToResponse(savedUser);
 
