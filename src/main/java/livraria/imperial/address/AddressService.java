@@ -1,7 +1,7 @@
-package livraria.imperial.domain.model.services;
+package livraria.imperial.address;
 
-import livraria.imperial.domain.model.entities.AddressEntity;
-import livraria.imperial.domain.model.repositories.AddressRepository;
+import livraria.imperial.address.AddressEntity;
+import livraria.imperial.address.AddressRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

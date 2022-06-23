@@ -1,4 +1,4 @@
-package livraria.imperial.domain.model.entities;
+package livraria.imperial.country;
 
 import lombok.*;
 

@@ -1,4 +1,4 @@
-package livraria.imperial.domain.model.responses;
+package livraria.imperial.user.dtos;
 
 
 import lombok.AllArgsConstructor;

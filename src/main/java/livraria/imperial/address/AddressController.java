@@ -1,8 +1,6 @@
-package livraria.imperial.controllers;
+package livraria.imperial.address;
 
 
-import livraria.imperial.domain.model.entities.AddressEntity;
-import livraria.imperial.domain.model.services.AddressService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

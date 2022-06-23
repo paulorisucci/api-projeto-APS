@@ -24,7 +24,6 @@ public class CustomControllerAdvice {
         return new ResponseEntity<>(new ErrorResponse(status, e.getMessage()), status);
     }
 
-
     @ExceptionHandler(LoginFailedException.class)
     public ResponseEntity<ErrorResponse> handleLoginFailedException(Exception e) {
 

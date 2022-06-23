@@ -1,7 +1,8 @@
-package livraria.imperial.domain.model.repositories;
+package livraria.imperial.country;
 
-import livraria.imperial.domain.model.entities.CountryEntity;
+import livraria.imperial.country.CountryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CountryRepository extends JpaRepository<CountryEntity, Integer> {
+    boolean existsByName();
 }

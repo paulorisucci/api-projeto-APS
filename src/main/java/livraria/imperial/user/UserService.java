@@ -1,12 +1,11 @@
-package livraria.imperial.domain.model.services;
+package livraria.imperial.user;
 
-import livraria.imperial.domain.model.dtos.LoginRequest;
-import livraria.imperial.domain.model.entities.UserEntity;
-import livraria.imperial.domain.model.repositories.AdminRepository;
-import livraria.imperial.domain.model.repositories.UserRepository;
+import livraria.imperial.user.dtos.LoginRequest;
+import livraria.imperial.user.admin.AdminRepository;
 import livraria.imperial.exceptions.EntityAlreadyExistsException;
 import livraria.imperial.exceptions.EntityNotFoundException;
 import livraria.imperial.exceptions.LoginFailedException;
+import livraria.imperial.user.dtos.UserEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,21 +13,23 @@ import java.util.List;
 @Service
 public class UserService {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    private AdminRepository adminRepository;
+    private final AdminRepository adminRepository;
 
-    private final String USER_NOT_FOUND = "Usuário não encontrado";
+    private static class UserServiceMessages {
 
-    private final String LOGIN_FAILED_FOR_USER = "O login falhou para as credenciais. Login ou senha incorretos";
+        private final static String USER_NOT_FOUND = "Usuário não encontrado";
 
-    private final String LOGIN_FAILED_FOR_ADMIN = "O login falhou para as credenciais. Login ou senha incorretos";
+        private final static String LOGIN_FAILED_FOR_USER = "O login falhou para as credenciais. Login ou senha incorretos";
 
-    private final String USER_WITH_EMAIL_ALREADY_EXISTS = "O email informado já está cadastrado";
+        private final static String LOGIN_FAILED_FOR_ADMIN = "O login falhou para as credenciais. Login ou senha incorretos";
 
-    private static final String USER_WITH_CPF_ALREADY_EXISTS = "O cpf informado é inválido ou já existe";
+        private final static String USER_WITH_EMAIL_ALREADY_EXISTS = "O email informado já está cadastrado";
 
+        private static final String USER_WITH_CPF_ALREADY_EXISTS = "O cpf informado é inválido ou já existe";
 
+    }
 
     public UserService(UserRepository userRepository, AdminRepository adminRepository) {
         this.userRepository = userRepository;
@@ -42,12 +43,12 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public UserEntity update(UserEntity user) {
-        verifyIfUserExists(user.getId());
-        verifyIfUserWithLoginAlreadyExists(user.getLogin());
-        verifyIfUserWithCpfAlreadyExists(user.getCpf());
-        verifyIfUserWithEmailAlreadyExists(user.getEmail());
-        return userRepository.save(user);
+    public UserEntity update(UserEntity updatedUser) {
+        verifyIfUserExists(updatedUser.getId());
+        verifyIfUserWithLoginAlreadyExists(updatedUser.getLogin());
+        verifyIfUserWithCpfAlreadyExists(updatedUser.getCpf());
+        verifyIfUserWithEmailAlreadyExists(updatedUser.getEmail());
+        return userRepository.save(updatedUser);
     }
 
     public List<UserEntity> list() {
@@ -69,39 +70,39 @@ public class UserService {
 
     public UserEntity searchUserForLogin(LoginRequest loginRequest) {
         return userRepository.findByLoginAndPassword(loginRequest.getLogin(),
-                loginRequest.getPassword()).orElseThrow(() -> new LoginFailedException(LOGIN_FAILED_FOR_USER));
+                loginRequest.getPassword()).orElseThrow(() -> new LoginFailedException(UserServiceMessages.LOGIN_FAILED_FOR_USER));
     }
 
     public UserEntity searchAdminForLogin(LoginRequest loginRequest) {
         return adminRepository.findByLoginAndPassword(loginRequest.getLogin(), loginRequest.getPassword())
-                .orElseThrow(() -> new LoginFailedException(LOGIN_FAILED_FOR_ADMIN));
+                .orElseThrow(() -> new LoginFailedException(UserServiceMessages.LOGIN_FAILED_FOR_ADMIN));
     }
 
     public UserEntity searchForUserById(Integer id) {
-        return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND));
+        return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(UserServiceMessages.USER_NOT_FOUND));
     }
 
     public void verifyIfUserExists(Integer id) {
         if(!userRepository.existsById(id)) {
-            throw new EntityNotFoundException(USER_NOT_FOUND);
+            throw new EntityNotFoundException(UserServiceMessages.USER_NOT_FOUND);
         }
     }
 
     public void verifyIfUserWithEmailAlreadyExists(String email) {
         if(userRepository.existsByEmail(email)) {
-            throw new EntityAlreadyExistsException(USER_WITH_EMAIL_ALREADY_EXISTS);
+            throw new EntityAlreadyExistsException(UserServiceMessages.USER_WITH_EMAIL_ALREADY_EXISTS);
         }
     }
 
     public void verifyIfUserWithCpfAlreadyExists(String cpf) {
         if(userRepository.existsByCpf(cpf)) {
-            throw new EntityAlreadyExistsException(USER_WITH_CPF_ALREADY_EXISTS);
+            throw new EntityAlreadyExistsException(UserServiceMessages.USER_WITH_CPF_ALREADY_EXISTS);
         }
     }
 
     public void verifyIfUserWithLoginAlreadyExists(String login) {
         if(userRepository.existsByLogin(login)) {
-            throw new EntityAlreadyExistsException(USER_WITH_CPF_ALREADY_EXISTS);
+            throw new EntityAlreadyExistsException(UserServiceMessages.USER_WITH_CPF_ALREADY_EXISTS);
         }
     }
 }

@@ -1,6 +1,7 @@
-package livraria.imperial.domain.model.entities;
+package livraria.imperial.user.admin;
 
 
+import livraria.imperial.user.dtos.UserEntity;
 import lombok.*;
 
 import javax.persistence.Column;

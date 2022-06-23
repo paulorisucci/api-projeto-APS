@@ -1,9 +1,8 @@
 package livraria.imperial.factory;
 
-import livraria.imperial.domain.model.entities.UserEntity;
+import livraria.imperial.user.dtos.UserEntity;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 

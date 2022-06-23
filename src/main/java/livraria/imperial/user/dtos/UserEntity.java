@@ -1,7 +1,8 @@
-package livraria.imperial.domain.model.entities;
+package livraria.imperial.user.dtos;
 
 import javax.persistence.*;
 import com.google.common.hash.Hashing;
+import livraria.imperial.address.AddressEntity;
 import lombok.*;
 
 import java.nio.charset.StandardCharsets;

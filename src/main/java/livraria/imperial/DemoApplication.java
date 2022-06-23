@@ -1,6 +1,6 @@
 package livraria.imperial;
 
-import livraria.imperial.domain.model.repositories.custom.CustomRepositoryImpl;
+import livraria.imperial.customRepositories.CustomRepositoryImpl;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;

@@ -1,7 +1,5 @@
-package livraria.imperial.domain.model.repositories;
+package livraria.imperial.user.admin;
 
-import livraria.imperial.domain.model.entities.AdminEntity;
-import livraria.imperial.domain.model.entities.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

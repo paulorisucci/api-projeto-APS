@@ -1,8 +1,8 @@
 package livraria.imperial.service;
 
-import livraria.imperial.domain.model.entities.UserEntity;
-import livraria.imperial.domain.model.repositories.UserRepository;
-import livraria.imperial.domain.model.services.UserService;
+import livraria.imperial.user.dtos.UserEntity;
+import livraria.imperial.user.UserRepository;
+import livraria.imperial.user.UserService;
 import livraria.imperial.factory.UserFactoryTest;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.Test;

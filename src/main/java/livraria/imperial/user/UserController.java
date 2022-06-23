@@ -1,10 +1,8 @@
-package livraria.imperial.controllers;
+package livraria.imperial.user;
 
-import livraria.imperial.domain.model.dtos.LoginRequest;
-import livraria.imperial.domain.model.entities.UserEntity;
-import livraria.imperial.domain.model.mappers.UserMapper;
-import livraria.imperial.domain.model.responses.UserResponse;
-import livraria.imperial.domain.model.services.UserService;
+import livraria.imperial.user.dtos.LoginRequest;
+import livraria.imperial.user.dtos.UserEntity;
+import livraria.imperial.user.dtos.UserResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,9 +17,9 @@ public class UserController {
 
     private final UserService service;
 
-    private final UserMapper mapper;
+    private final UserRepository.UserMapper mapper;
 
-    public UserController(UserService service, UserMapper mapper) {
+    public UserController(UserService service, UserRepository.UserMapper mapper) {
         this.service = service;
         this.mapper = mapper;
     }
@@ -29,9 +27,7 @@ public class UserController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UserResponse createUser(@RequestBody UserEntity user) {
-
-        var response = mapper.mapEntityToResponse(service.create(user));
-        return response;
+        return mapper.mapEntityToResponse(service.create(user));
     }
 
     @GetMapping

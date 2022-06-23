@@ -1,8 +1,6 @@
-package livraria.imperial.controllers;
+package livraria.imperial.country;
 
 
-import livraria.imperial.domain.model.entities.CountryEntity;
-import livraria.imperial.domain.model.services.CountryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +22,7 @@ public class CountryController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CountryEntity createCountry(@RequestBody CountryEntity entity) {
-        return service.save(entity);
+        return service.create(entity);
     }
 
     @GetMapping("/{idCountry}")
@@ -41,7 +39,7 @@ public class CountryController {
     public ResponseEntity<CountryEntity> updateCountry(@PathVariable("idCountry") Integer id,
                                                        @RequestBody CountryEntity entity) {
         entity.setId(id);
-        return ResponseEntity.ok(service.save(entity));
+        return ResponseEntity.ok(service.create(entity));
     }
 
     @DeleteMapping("/{idCountry}")

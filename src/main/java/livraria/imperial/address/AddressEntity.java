@@ -1,7 +1,7 @@
-package livraria.imperial.domain.model.entities;
+package livraria.imperial.address;
 
+import livraria.imperial.country.CountryEntity;
 import lombok.*;
-import org.hibernate.annotations.Fetch;
 
 import javax.persistence.*;
 

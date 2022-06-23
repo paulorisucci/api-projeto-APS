@@ -1,4 +1,4 @@
-package livraria.imperial.domain.model.repositories.custom;
+package livraria.imperial.customRepositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.NoRepositoryBean;
