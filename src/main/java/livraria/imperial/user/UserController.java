@@ -1,5 +1,6 @@
 package livraria.imperial.user;
 
+import livraria.imperial.user.dtos.CreateUserRequest;
 import livraria.imperial.user.dtos.LoginRequest;
 import livraria.imperial.user.dtos.UserEntity;
 import livraria.imperial.user.dtos.UserResponse;
@@ -8,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 
@@ -17,17 +19,18 @@ public class UserController {
 
     private final UserService service;
 
-    private final UserRepository.UserMapper mapper;
+    private final UserMapper mapper;
 
-    public UserController(UserService service, UserRepository.UserMapper mapper) {
+    public UserController(UserService service, UserMapper mapper) {
         this.service = service;
         this.mapper = mapper;
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UserResponse createUser(@RequestBody UserEntity user) {
-        return mapper.mapEntityToResponse(service.create(user));
+    public UserResponse createUser(@RequestBody @Valid CreateUserRequest createUserRequest) {
+        UserEntity userEntity = mapper.mapRequestToEntity(createUserRequest);
+        return mapper.mapEntityToResponse(service.create(userEntity));
     }
 
     @GetMapping

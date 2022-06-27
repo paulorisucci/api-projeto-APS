@@ -14,7 +14,10 @@ public class AddressController {
 
     private AddressService service;
 
-    private final String PATH_ID_ADDRESS = "/{idAddress}";
+    private static class Paths  {
+        private final static String PATH_ID_ADDRESS = "/{idAddress}";
+    }
+
 
     public AddressController(AddressService service) {
         this.service = service;
@@ -32,18 +35,18 @@ public class AddressController {
         return ResponseEntity.ok(service.list());
     }
 
-    @GetMapping(PATH_ID_ADDRESS)
+    @GetMapping(Paths.PATH_ID_ADDRESS)
     public ResponseEntity<AddressEntity> getAddress(@PathVariable Integer idAddress) {
         return ResponseEntity.ok(service.find(idAddress));
     }
 
-    @DeleteMapping(PATH_ID_ADDRESS)
+    @DeleteMapping(Paths.PATH_ID_ADDRESS)
     public ResponseEntity<Void> deleteAddress(@PathVariable Integer idAddress) {
         service.delete(idAddress);
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping(PATH_ID_ADDRESS)
+    @PutMapping(Paths.PATH_ID_ADDRESS)
     public ResponseEntity<AddressEntity> update(@PathVariable Integer idAddress, @RequestBody AddressEntity addressEntity) {
         addressEntity.setId(idAddress);
         return ResponseEntity.ok(service.save(addressEntity));

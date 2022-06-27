@@ -20,6 +20,17 @@ public class UserFactoryTest {
                 .build();
     }
 
+    public static UserEntity createAValidUserWithoutId() {
+        return UserEntity.builder()
+                .name("test")
+                .cpf("12345678910")
+                .email("test@test.com")
+                .login("test")
+                .password("test")
+                .address(null)
+                .build();
+    }
+
     public static List<UserEntity> createAnUserList(Integer size) {
 
         List<UserEntity> userList = new ArrayList<>(size);

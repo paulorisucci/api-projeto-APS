@@ -5,6 +5,7 @@ import livraria.imperial.exceptions.EntityNotFoundException;
 import livraria.imperial.exceptions.LoginFailedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.HttpClientErrorException;
@@ -38,6 +39,24 @@ public class CustomControllerAdvice {
         HttpStatus status = HttpStatus.BAD_REQUEST;
 
         return new ResponseEntity<>(new ErrorResponse(status, e.getMessage()), status);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> bindArgumentNotValid(Exception e) {
+
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+
+        String message = methodArgumentoNotValidMessage(e);
+
+        return new ResponseEntity<>(new ErrorResponse(status, message), status);
+    }
+
+    private String methodArgumentoNotValidMessage (Exception e) {
+        StringBuilder newMessage = new StringBuilder();
+        newMessage.append("A requisição feita está inválida. Causas: [");
+        ((MethodArgumentNotValidException) e).getAllErrors().forEach(error -> newMessage.append(error.getDefaultMessage()).append(", "));
+        newMessage.append("]");
+        return String.valueOf(newMessage);
     }
 
     @ExceptionHandler(Exception.class)

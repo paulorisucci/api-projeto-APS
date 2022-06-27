@@ -1,6 +1,7 @@
 package livraria.imperial.country;
 
 import livraria.imperial.exceptions.EntityAlreadyExistsException;
+import livraria.imperial.exceptions.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,7 +12,9 @@ public class CountryService {
     CountryRepository countryRepository;
 
     private static class CountryServiceMessages {
-        private static final String COUNTRY_ALREADY_EXISTS = "Given country already exists in database";
+
+        private static final String COUNTRY_DOES_NOT_EXIST = "Não existe um país cadastrado com esse id";
+        private static final String COUNTRY_ALREADY_EXISTS = "Já existe um país cadastrado com nome {}";
     }
 
     public CountryService(CountryRepository countryRepository){
@@ -19,12 +22,17 @@ public class CountryService {
     }
 
     public CountryEntity create(CountryEntity country) {
-        verifyIfCountryAlreadyExists(country);
-        return countryRepository.save(country);
+        verifyIfCountryAlreadyExistsByName(country);
+        return save(country);
+    }
+
+    public CountryEntity update(CountryEntity country) {
+        verifyIfCountryExistsById(country);
+        return save(country);
     }
 
     public CountryEntity find(Integer id) {
-        return countryRepository.findById(id).orElse(null);
+        return countryRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
     public List<CountryEntity> list() {
@@ -39,11 +47,19 @@ public class CountryService {
         );
     }
 
-
-
-    private void verifyIfCountryAlreadyExists(CountryEntity country) {
-        if(countryRepository.existsByName()) {
-            throw new EntityAlreadyExistsException(CountryServiceMessages.COUNTRY_ALREADY_EXISTS);
+    public void verifyIfCountryExistsById(CountryEntity country) {
+        if(!countryRepository.existsById(country.getId())) {
+            throw new EntityNotFoundException(CountryServiceMessages.COUNTRY_DOES_NOT_EXIST);
         }
+    }
+
+    private void verifyIfCountryAlreadyExistsByName(CountryEntity country) {
+        if(countryRepository.existsByName(country.getName())) {
+            throw new EntityAlreadyExistsException(CountryServiceMessages.COUNTRY_ALREADY_EXISTS.replace("{}", country.getName()));
+        }
+    }
+
+    public CountryEntity save(CountryEntity country) {
+        return countryRepository.save(country);
     }
 }

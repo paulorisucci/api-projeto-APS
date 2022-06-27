@@ -40,11 +40,4 @@ public class UserEntity {
     @JoinColumn(name = "id_endereco", referencedColumnName = "id_endereco")
     private AddressEntity address;
 
-    public void setPassword(String password) {
-        this.password = encodeEntry(password);
-    }
-
-    private String encodeEntry (String entry) {
-        return Hashing.sha256().hashString(entry, StandardCharsets.UTF_8).toString();
-    }
 }

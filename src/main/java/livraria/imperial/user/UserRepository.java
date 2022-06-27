@@ -4,10 +4,12 @@ import livraria.imperial.user.dtos.UserEntity;
 import livraria.imperial.user.dtos.UserResponse;
 import org.mapstruct.Mapper;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public interface UserRepository extends JpaRepository<UserEntity, Integer> {
 
 
@@ -19,11 +21,4 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
 
     boolean existsByLogin(String login);
 
-    @Mapper(componentModel = "spring")
-    interface UserMapper {
-
-        UserResponse mapEntityToResponse(UserEntity user);
-
-        List<UserResponse> mapListToResponse(List<UserEntity> users);
-    }
 }

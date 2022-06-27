@@ -15,17 +15,21 @@ public class CountryController {
 
     private CountryService service;
 
+    private static class Paths{
+        private static final String PATH_ID_COUNTRY = "/{idCountry}";
+    }
+
     public CountryController(CountryService service) {
         this.service = service;
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CountryEntity createCountry(@RequestBody CountryEntity entity) {
-        return service.create(entity);
+    public CountryEntity createCountry(@RequestBody CountryEntity country) {
+        return service.create(country);
     }
 
-    @GetMapping("/{idCountry}")
+    @GetMapping(Paths.PATH_ID_COUNTRY)
     public ResponseEntity<CountryEntity> findCountry(@PathVariable("idCountry") Integer idCountry) {
         return ResponseEntity.ok(service.find(idCountry));
     }
@@ -35,14 +39,14 @@ public class CountryController {
         return ResponseEntity.ok(service.list());
     }
 
-    @PutMapping("/{idCountry}")
+    @PutMapping(Paths.PATH_ID_COUNTRY)
     public ResponseEntity<CountryEntity> updateCountry(@PathVariable("idCountry") Integer id,
-                                                       @RequestBody CountryEntity entity) {
-        entity.setId(id);
-        return ResponseEntity.ok(service.create(entity));
+                                                       @RequestBody CountryEntity country) {
+        country.setId(id);
+        return ResponseEntity.ok(service.update(country));
     }
 
-    @DeleteMapping("/{idCountry}")
+    @DeleteMapping(Paths.PATH_ID_COUNTRY)
     public ResponseEntity<Void> deleteCountry(@PathVariable("idCountry") Integer id) {
         service.delete(id);
         return ResponseEntity.noContent().build();

@@ -6,12 +6,15 @@ import livraria.imperial.exceptions.EntityAlreadyExistsException;
 import livraria.imperial.exceptions.EntityNotFoundException;
 import livraria.imperial.exceptions.LoginFailedException;
 import livraria.imperial.user.dtos.UserEntity;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class UserService {
+
 
     private final UserRepository userRepository;
 
@@ -29,11 +32,6 @@ public class UserService {
 
         private static final String USER_WITH_CPF_ALREADY_EXISTS = "O cpf informado é inválido ou já existe";
 
-    }
-
-    public UserService(UserRepository userRepository, AdminRepository adminRepository) {
-        this.userRepository = userRepository;
-        this.adminRepository = adminRepository;
     }
 
     public UserEntity create(UserEntity user) {
