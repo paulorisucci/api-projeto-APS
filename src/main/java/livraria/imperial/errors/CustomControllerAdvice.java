@@ -2,6 +2,7 @@ package livraria.imperial.errors;
 
 import livraria.imperial.exceptions.EntityAlreadyExistsException;
 import livraria.imperial.exceptions.EntityNotFoundException;
+import livraria.imperial.exceptions.InvalidCategoryException;
 import livraria.imperial.exceptions.LoginFailedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +50,14 @@ public class CustomControllerAdvice {
         String message = methodArgumentoNotValidMessage(e);
 
         return new ResponseEntity<>(new ErrorResponse(status, message), status);
+    }
+
+    @ExceptionHandler(InvalidCategoryException.class)
+    public ResponseEntity<ErrorResponse> categoryNotValid(Exception e) {
+
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+
+        return new ResponseEntity<>(new ErrorResponse(status, e.getMessage()), status);
     }
 
     private String methodArgumentoNotValidMessage (Exception e) {

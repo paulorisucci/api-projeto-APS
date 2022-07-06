@@ -8,8 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.nio.charset.StandardCharsets;
 
@@ -17,26 +15,22 @@ import java.nio.charset.StandardCharsets;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class CreateUserRequest {
+public class PartialUpdateUserRequest {
 
-    @NotNull(message = "{user.name.notnull}")
     @Size(min = 2, max = 100, message = "{user.name.size}")
     private String name;
 
     @Size(min = 11, max = 11, message = "{user.cpf.size}")
     private String cpf;
 
-    @NotEmpty(message = "{user.email.notempty}")
     @Email(message = "{user.email.format}")
     private String email;
 
-    @NotNull(message = "{user.login.notnull}")
     private String login;
 
-    @NotNull(message = "{user.password.notnull}")
     private String password;
 
-//    private AddressEntity address;
+    private AddressEntity address;
 
     private String encryptEntry(String entry) {
         return Hashing.sha256()

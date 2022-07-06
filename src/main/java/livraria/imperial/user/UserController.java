@@ -1,9 +1,6 @@
 package livraria.imperial.user;
 
-import livraria.imperial.user.dtos.CreateUserRequest;
-import livraria.imperial.user.dtos.LoginRequest;
-import livraria.imperial.user.dtos.UserEntity;
-import livraria.imperial.user.dtos.UserResponse;
+import livraria.imperial.user.dtos.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +26,7 @@ public class UserController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UserResponse createUser(@RequestBody @Valid CreateUserRequest createUserRequest) {
-        UserEntity userEntity = mapper.mapRequestToEntity(createUserRequest);
+        UserEntity userEntity = mapper.mapCreateRequestToEntity(createUserRequest);
         return mapper.mapEntityToResponse(service.create(userEntity));
     }
 
@@ -52,12 +49,10 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{idUser}")
-    public ResponseEntity<UserResponse> update(@PathVariable("idUser") Integer idUser, @RequestBody UserEntity user) {
+    @PatchMapping("/{idUser}")
+    public ResponseEntity<UserResponse> update(@PathVariable("idUser")  Integer idUser, @RequestBody @Valid PartialUpdateUserRequest request) {
 
-        user.setId(idUser);
-
-        final var savedUser = service.update(user);
+        final var savedUser = service.partialUpdate(idUser, request);
 
         final var response = mapper.mapEntityToResponse(savedUser);
 

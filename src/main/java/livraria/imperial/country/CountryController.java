@@ -1,11 +1,14 @@
 package livraria.imperial.country;
 
 
+import livraria.imperial.country.dtos.CountryEntity;
+import livraria.imperial.country.dtos.CountryRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 
@@ -13,19 +16,22 @@ import java.util.List;
 @RequestMapping( value = "/countries", produces = {MediaType.APPLICATION_JSON_VALUE})
 public class CountryController {
 
-    private CountryService service;
+    private final CountryService service;
+    private final CountryMapper mapper;
 
     private static class Paths{
         private static final String PATH_ID_COUNTRY = "/{idCountry}";
     }
 
-    public CountryController(CountryService service) {
+    public CountryController(CountryService service, CountryMapper mapper) {
         this.service = service;
+        this.mapper = mapper;
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CountryEntity createCountry(@RequestBody CountryEntity country) {
+    public CountryEntity createCountry(@RequestBody @Valid CountryRequest request) {
+        CountryEntity country = mapper.mapRequestToEntity(request);
         return service.create(country);
     }
 
@@ -41,7 +47,9 @@ public class CountryController {
 
     @PutMapping(Paths.PATH_ID_COUNTRY)
     public ResponseEntity<CountryEntity> updateCountry(@PathVariable("idCountry") Integer id,
-                                                       @RequestBody CountryEntity country) {
+                                                       @RequestBody @Valid CountryRequest request) {
+
+        CountryEntity country = mapper.mapRequestToEntity(request);
         country.setId(id);
         return ResponseEntity.ok(service.update(country));
     }

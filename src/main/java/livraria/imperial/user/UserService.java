@@ -1,15 +1,18 @@
 package livraria.imperial.user;
 
+import livraria.imperial.address.AddressRepository;
 import livraria.imperial.user.dtos.LoginRequest;
 import livraria.imperial.user.admin.AdminRepository;
 import livraria.imperial.exceptions.EntityAlreadyExistsException;
 import livraria.imperial.exceptions.EntityNotFoundException;
 import livraria.imperial.exceptions.LoginFailedException;
+import livraria.imperial.user.dtos.PartialUpdateUserRequest;
 import livraria.imperial.user.dtos.UserEntity;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @AllArgsConstructor
@@ -20,7 +23,9 @@ public class UserService {
 
     private final AdminRepository adminRepository;
 
-    private static class UserServiceMessages {
+    private final AddressRepository addressRepository;
+
+    private static class Messages {
 
         private final static String USER_NOT_FOUND = "Usuário não encontrado";
 
@@ -32,21 +37,24 @@ public class UserService {
 
         private static final String USER_WITH_CPF_ALREADY_EXISTS = "O cpf informado é inválido ou já existe";
 
+        private static final String ADDRESS_DOES_NOT_EXIST = "O endereço informado não existe";
+
     }
 
     public UserEntity create(UserEntity user) {
-        verifyIfUserWithLoginAlreadyExists(user.getLogin());
-        verifyIfUserWithCpfAlreadyExists(user.getCpf());
-        verifyIfUserWithEmailAlreadyExists(user.getEmail());
+        verifyIfUserWithLoginAlreadyExists(user);
+        verifyIfUserWithCpfAlreadyExists(user);
+        verifyIfUserWithEmailAlreadyExists(user);
         return userRepository.save(user);
     }
 
-    public UserEntity update(UserEntity updatedUser) {
-        verifyIfUserExists(updatedUser.getId());
-        verifyIfUserWithLoginAlreadyExists(updatedUser.getLogin());
-        verifyIfUserWithCpfAlreadyExists(updatedUser.getCpf());
-        verifyIfUserWithEmailAlreadyExists(updatedUser.getEmail());
-        return userRepository.save(updatedUser);
+    public UserEntity partialUpdate(Integer idUser, PartialUpdateUserRequest updateRequest) {
+        UserEntity user = find(idUser);
+        verifyIfUserWithLoginAndWithoutIdAlreadyExists(user);
+        verifyIfUserWithCpfAndWithoutIdAlreadyExists(user);
+        verifyIfUserWithEmailAndWithoutIdAlreadyExists(user);
+        user.partialUpdate(updateRequest);
+        return userRepository.save(user);
     }
 
     public List<UserEntity> list() {
@@ -59,7 +67,7 @@ public class UserService {
 
     public void delete(Integer id) {
         final var deletedUser = userRepository.findById(id);
-        deletedUser.ifPresent( user -> userRepository.delete(user));
+        deletedUser.ifPresent(userRepository::delete);
     }
 
     public UserEntity login(LoginRequest loginRequest) {
@@ -68,39 +76,57 @@ public class UserService {
 
     public UserEntity searchUserForLogin(LoginRequest loginRequest) {
         return userRepository.findByLoginAndPassword(loginRequest.getLogin(),
-                loginRequest.getPassword()).orElseThrow(() -> new LoginFailedException(UserServiceMessages.LOGIN_FAILED_FOR_USER));
+                loginRequest.getPassword()).orElseThrow(() -> new LoginFailedException(Messages.LOGIN_FAILED_FOR_USER));
     }
 
     public UserEntity searchAdminForLogin(LoginRequest loginRequest) {
         return adminRepository.findByLoginAndPassword(loginRequest.getLogin(), loginRequest.getPassword())
-                .orElseThrow(() -> new LoginFailedException(UserServiceMessages.LOGIN_FAILED_FOR_ADMIN));
+                .orElseThrow(() -> new LoginFailedException(Messages.LOGIN_FAILED_FOR_ADMIN));
     }
 
     public UserEntity searchForUserById(Integer id) {
-        return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(UserServiceMessages.USER_NOT_FOUND));
+        return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(Messages.USER_NOT_FOUND));
     }
 
-    public void verifyIfUserExists(Integer id) {
+    public void verifyIfUserWithEmailAndWithoutIdAlreadyExists(UserEntity user) {
+        if(userRepository.existsByEmailAndIdNot(user.getEmail(), user.getId())) {
+            throw new EntityAlreadyExistsException(Messages.USER_WITH_EMAIL_ALREADY_EXISTS);
+        }
+    }
+
+    public void verifyIfUserWithCpfAndWithoutIdAlreadyExists(UserEntity user) {
+        if(userRepository.existsByCpfAndIdNot(user.getCpf(), user.getId())) {
+            throw new EntityAlreadyExistsException(Messages.USER_WITH_CPF_ALREADY_EXISTS);
+        }
+    }
+
+    public void verifyIfUserWithLoginAndWithoutIdAlreadyExists(UserEntity user) {
+        if(userRepository.existsByLoginAndIdNot(user.getLogin(), user.getId())) {
+            throw new EntityAlreadyExistsException(Messages.USER_WITH_CPF_ALREADY_EXISTS);
+        }
+    }
+
+    public void verifyIfUserWithEmailAlreadyExists(UserEntity user) {
+        if(userRepository.existsByEmail(user.getEmail())) {
+            throw new EntityAlreadyExistsException(Messages.USER_WITH_EMAIL_ALREADY_EXISTS);
+        }
+    }
+
+    public void verifyIfUserWithCpfAlreadyExists(UserEntity user) {
+        if(userRepository.existsByCpf(user.getCpf())) {
+            throw new EntityAlreadyExistsException(Messages.USER_WITH_CPF_ALREADY_EXISTS);
+        }
+    }
+
+    public void verifyIfUserWithLoginAlreadyExists(UserEntity user) {
+        if(userRepository.existsByLogin(user.getLogin())) {
+            throw new EntityAlreadyExistsException(Messages.USER_WITH_CPF_ALREADY_EXISTS);
+        }
+    }
+
+    public void verifyIfExistsById(Integer id) {
         if(!userRepository.existsById(id)) {
-            throw new EntityNotFoundException(UserServiceMessages.USER_NOT_FOUND);
-        }
-    }
-
-    public void verifyIfUserWithEmailAlreadyExists(String email) {
-        if(userRepository.existsByEmail(email)) {
-            throw new EntityAlreadyExistsException(UserServiceMessages.USER_WITH_EMAIL_ALREADY_EXISTS);
-        }
-    }
-
-    public void verifyIfUserWithCpfAlreadyExists(String cpf) {
-        if(userRepository.existsByCpf(cpf)) {
-            throw new EntityAlreadyExistsException(UserServiceMessages.USER_WITH_CPF_ALREADY_EXISTS);
-        }
-    }
-
-    public void verifyIfUserWithLoginAlreadyExists(String login) {
-        if(userRepository.existsByLogin(login)) {
-            throw new EntityAlreadyExistsException(UserServiceMessages.USER_WITH_CPF_ALREADY_EXISTS);
+            throw new EntityNotFoundException(Messages.USER_NOT_FOUND);
         }
     }
 }

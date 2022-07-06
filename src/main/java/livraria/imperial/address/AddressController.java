@@ -1,10 +1,13 @@
 package livraria.imperial.address;
 
 
+import livraria.imperial.address.dto.AddressEntity;
+import livraria.imperial.address.dto.AddressRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 
@@ -14,19 +17,24 @@ public class AddressController {
 
     private AddressService service;
 
+    private AddressMapper mapper;
+
     private static class Paths  {
         private final static String PATH_ID_ADDRESS = "/{idAddress}";
     }
 
 
-    public AddressController(AddressService service) {
+    public AddressController(AddressService service, AddressMapper mapper) {
         this.service = service;
+        this.mapper = mapper;
     }
 
     @PostMapping
-    public AddressEntity createAddress(@RequestBody AddressEntity addressEntity) {
+    public AddressEntity createAddress(@RequestBody @Valid AddressRequest request) {
 
-        return service.save(addressEntity);
+        AddressEntity address = mapper.mapRequestToEntity(request);
+
+        return service.create(address);
     }
 
     @GetMapping
@@ -47,8 +55,9 @@ public class AddressController {
     }
 
     @PutMapping(Paths.PATH_ID_ADDRESS)
-    public ResponseEntity<AddressEntity> update(@PathVariable Integer idAddress, @RequestBody AddressEntity addressEntity) {
-        addressEntity.setId(idAddress);
-        return ResponseEntity.ok(service.save(addressEntity));
+    public ResponseEntity<AddressEntity> update(@PathVariable Integer idAddress, @RequestBody @Valid AddressRequest request) {
+        AddressEntity address = mapper.mapRequestToEntity(request);
+        address.setId(idAddress);
+        return ResponseEntity.ok(service.update(address));
     }
 }

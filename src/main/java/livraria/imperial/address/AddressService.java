@@ -1,10 +1,12 @@
 package livraria.imperial.address;
 
-import livraria.imperial.address.AddressEntity;
-import livraria.imperial.address.AddressRepository;
+import livraria.imperial.address.dto.AddressEntity;
+import livraria.imperial.exceptions.EntityAlreadyExistsException;
+import livraria.imperial.exceptions.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AddressService {
@@ -15,11 +17,28 @@ public class AddressService {
         this.repository = repository;
     }
 
-    public AddressEntity save(AddressEntity address) {
-        AddressEntity createdAddress = repository.save(address);
-        repository.refresh(createdAddress);
+    private static class Messages {
+        public final static String ADDRESS_NOT_FOUND = "Endereco não encontrado";
 
-        return createdAddress;
+        public final static String ADDRESS_ALREADY_EXISTS = "Endereco já existe";
+
+    }
+
+    public AddressEntity create(AddressEntity address) {
+        verifyIfAddressAlreadyExist(address);
+        return saveAddress(address);
+    }
+
+    public AddressEntity update(AddressEntity address) {
+        verifyIfAddressExists(address.getId());
+        verifyIfAddressAlreadyExist(address);
+        return saveAddress(address);
+    }
+
+    private AddressEntity saveAddress(AddressEntity address) {
+        AddressEntity savedAddress = repository.save(address);
+        repository.refresh(savedAddress);
+        return savedAddress;
     }
 
     public List<AddressEntity> list() {
@@ -27,7 +46,29 @@ public class AddressService {
     }
 
     public AddressEntity find(Integer id) {
-        return repository.findById(id).orElse(null);
+        return searchAddressById(id);
+    }
+
+    private AddressEntity searchAddressById(Integer id) {
+        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException(Messages.ADDRESS_NOT_FOUND));
+    }
+
+    private void verifyIfAddressExists(Integer id) {
+         if(!repository.existsById(id)) {
+             throw new EntityNotFoundException(Messages.ADDRESS_NOT_FOUND);
+         }
+    }
+
+    private void verifyIfAddressAlreadyExist(AddressEntity address) {
+        Optional<AddressEntity> optionalAddress = repository.findOne(address.getBusinessKeyExample());
+
+        if(optionalAddress.isEmpty()) {
+            return;
+        }
+
+        if(!optionalAddress.get().equals(address))  {
+            throw new EntityAlreadyExistsException(Messages.ADDRESS_ALREADY_EXISTS);
+        }
     }
 
     public void delete(Integer id) {

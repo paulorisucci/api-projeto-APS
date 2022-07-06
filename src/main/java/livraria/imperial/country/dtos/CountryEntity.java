@@ -1,4 +1,4 @@
-package livraria.imperial.country;
+package livraria.imperial.country.dtos;
 
 import lombok.*;
 

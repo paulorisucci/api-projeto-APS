@@ -1,9 +1,14 @@
-package livraria.imperial.address;
+package livraria.imperial.address.dto;
 
-import livraria.imperial.country.CountryEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import livraria.imperial.country.dtos.CountryEntity;
 import lombok.*;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Example;
 
 import javax.persistence.*;
+import java.io.Serial;
+import java.io.Serializable;
 
 @Entity(name = "endereco")
 @Data
@@ -11,7 +16,10 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class AddressEntity {
+public class AddressEntity implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = -8110410999216407659L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,5 +47,14 @@ public class AddressEntity {
 
     @Column(name="complemento")
     private String complement;
+
+    private ExampleMatcher getBusinessKeyMatcher() {
+        return ExampleMatcher.matching().withIgnorePaths("id");
+    }
+
+    @JsonIgnore
+    public Example<AddressEntity> getBusinessKeyExample() {
+        return Example.of(this, this.getBusinessKeyMatcher());
+    }
 
 }
